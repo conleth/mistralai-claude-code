@@ -1,0 +1,55 @@
+# LiteLLM proxy config to front Mistral with OpenAI-compatible endpoints.
+# Usage:
+#   export MISTRAL_API_KEY=your_key
+#   litellm --config litellm.yaml
+#
+# Endpoints:
+#   OpenAI-compatible:  http://127.0.0.1:8787/v1/chat/completions
+# Models:
+#   - "mistral-small" (alias) -> mistral/mistral-small-latest
+#   - "mistral-tiny"  (alias) -> mistral/mistral-tiny
+
+litellm_settings:
+  drop_params: True
+  timeout: 300
+  num_retries: 2
+
+proxy:
+  host: 0.0.0.0
+  port: 4000
+  # Set MISTRAL_API_KEY in your environment.
+
+general_settings:
+  master_key: os.environ/LITELLM_MASTER_KEY  # Require authentication with master key
+
+  # Optional: Enable detailed logging
+  # litellm_proxy_budget_name: "default_budget"
+
+model_list:
+  # Claude model mappings -> Mistral
+  - model_name: claude-sonnet-4-5-20250929
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
+  - model_name: claude-opus-4-5-20251101
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
+  - model_name: claude-3-5-sonnet-20241022
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
+  - model_name: claude-3-7-sonnet-20250219
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
+
+  # Direct Mistral model access
+  - model_name: mistral-small
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
+  - model_name: mistral-tiny
+    litellm_params:
+      model: mistral/mistral-tiny
+      api_key: os.environ/MISTRAL_API_KEY
