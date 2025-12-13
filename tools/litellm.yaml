@@ -13,6 +13,7 @@ litellm_settings:
   drop_params: True
   timeout: 300
   num_retries: 2
+  callbacks: litellm_hooks.proxy_handler_instance
 
 proxy:
   host: 0.0.0.0
@@ -20,13 +21,18 @@ proxy:
   # Set MISTRAL_API_KEY in your environment.
 
 general_settings:
-  master_key: os.environ/LITELLM_MASTER_KEY  # Require authentication with master key
+  # Hardcode the master key so Claude can use x-api-key=lcl-local
+  master_key: lcl-local  # Require authentication with master key
 
   # Optional: Enable detailed logging
   # litellm_proxy_budget_name: "default_budget"
 
 model_list:
   # Claude model mappings -> Mistral
+  - model_name: claude-haiku-4-5-20251001
+    litellm_params:
+      model: mistral/mistral-small-latest
+      api_key: os.environ/MISTRAL_API_KEY
   - model_name: claude-sonnet-4-5-20250929
     litellm_params:
       model: mistral/mistral-small-latest
