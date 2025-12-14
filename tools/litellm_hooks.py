@@ -91,11 +91,17 @@ class ProxyHookStripClaudeExtras(CustomLogger):
         if not isinstance(msgs, list):
             return data
 
-        # If messages already contain tool_calls or tool role entries, assume
-        # they are already in OpenAI/Mistral shape and skip conversion.
-        if any(m.get("role") == "tool" for m in msgs) or any(
-            isinstance(m, dict) and "tool_calls" in m for m in msgs
-        ):
+        # If messages already contain tool role entries and no Anthropic blocks,
+        # assume they are already in OpenAI/Mistral shape and skip conversion.
+        has_tool_role = any(m.get("role") == "tool" for m in msgs)
+        has_anthropic_blocks = any(
+            isinstance(m.get("content"), list)
+            and any(
+                isinstance(b, dict) and b.get("type") in {"tool_use", "tool_result"} for b in m["content"]
+            )
+            for m in msgs
+        )
+        if has_tool_role and not has_anthropic_blocks:
             return data
 
         converted = []
@@ -139,7 +145,9 @@ class ProxyHookStripClaudeExtras(CustomLogger):
                     assistant_msg["content"] = "\n".join(texts)
                 else:
                     assistant_msg["content"] = ""
-                if tool_calls:
+                if m.get("tool_calls"):
+                    assistant_msg["tool_calls"] = m["tool_calls"]
+                elif tool_calls:
                     assistant_msg["tool_calls"] = tool_calls
                 converted.append(assistant_msg)
 
