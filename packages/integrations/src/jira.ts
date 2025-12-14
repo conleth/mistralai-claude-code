@@ -38,7 +38,6 @@ export interface JiraIssue {
     customFields?: Record<string, any>;
   };
   self: string;
-  key: string;
   created: string;
   updated: string;
   customFields?: Record<string, any>;
@@ -190,9 +189,9 @@ export class JiraAdapter {
     } catch (error) {
       if (error instanceof ApiError) {
         throw new IntegrationError(
-          `Failed to create Jira issue for requirement ${requirement.id}: ${error.message}`,
+          `Failed to create Jira issue for requirement ${requirement.requirementId}: ${error.message}`,
           'ISSUE_CREATION_FAILED',
-          { requirementId: requirement.id, error: error.details }
+          { requirementId: requirement.requirementId, error: error.details }
         );
       }
       throw error;
@@ -256,7 +255,7 @@ export class JiraAdapter {
     return `h2. Security Requirement
 
 *ID*: ${requirement.requirementId}
-*Standard*: ${requirement.standard.toUpperCase()} ${requirement.version}
+*Standard*: ${requirement.standard.toUpperCase()} ${requirement.standardVersion}
 *Level*: ${requirement.level}
 *Category*: ${requirement.category}
 
@@ -445,7 +444,7 @@ hr
       for (const [key, value] of Object.entries(response.data.issuetypes || {})) {
         issueTypes.push({
           id: key,
-          name: value.name,
+          name: (value as any).name,
         });
       }
       

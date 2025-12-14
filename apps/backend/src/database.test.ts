@@ -2,8 +2,8 @@
  * Database tests
  */
 
-import { describe, it, beforeAll, afterAll, expect, beforeEach } from 'vitest';
-import { initializeDatabase, closeDatabase } from './database';
+import { describe, it, beforeAll, afterAll, expect, beforeEach, afterEach } from 'vitest';
+import { initializeDatabase, closeDatabase } from './database.js';
 import { Database } from 'sqlite';
 import fs from 'fs';
 import path from 'path';
@@ -25,15 +25,9 @@ describe('Database', () => {
       await closeDatabase(db);
     }
     
-    // Override the database path for testing
-    const originalInit = initializeDatabase;
-    
     // Create a test-specific initialization
     const testInit = async () => {
-      const testDb = await Database.open({
-        filename: testDbPath,
-        driver: Database,
-      });
+      const testDb = new Database(testDbPath);
       
       // Run migrations manually for testing
       await testDb.exec(
@@ -57,7 +51,7 @@ describe('Database', () => {
     it('should create all tables', async () => {
       const tables = await db.all(
         "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
-      );
+      ) as Array<{ name: string }>;
       
       const tableNames = tables.map((t: { name: string }) => t.name);
       

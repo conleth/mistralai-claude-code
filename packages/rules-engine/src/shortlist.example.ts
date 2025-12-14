@@ -12,8 +12,8 @@ import type {
   QuestionnaireAnswers,
   RequirementRule,
   ShortlistedRequirement,
-  StandardRequirement,
 } from '@security-rat/types';
+import type { StandardRequirement } from '@security-rat/standards';
 
 /**
  * Example rules for ASVS requirements
@@ -437,7 +437,7 @@ async function main() {
 // Run the demo if this file is executed directly
 if (import.meta.vitest) {
   // This is being run by Vitest
-  export { generateShortlist };
+  // Note: generateShortlist is imported from index.ts, not defined here
 } else {
   main().catch(console.error);
 }

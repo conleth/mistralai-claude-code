@@ -2,14 +2,15 @@
  * API endpoint tests
  */
 
-import { describe, it, beforeAll, afterAll, expect, beforeEach } from 'vitest';
+import { describe, it, beforeAll, afterAll, expect } from 'vitest';
 import Fastify from 'fastify';
-import { initializeDatabase, closeDatabase } from './database';
+import type { FastifyInstance } from 'fastify';
+import { initializeDatabase, closeDatabase } from './database.js';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from 'uuid';
 
 describe('API Endpoints', () => {
-  let server: Fastify.Instance;
+  let server: FastifyInstance;
   let db: any;
   let testUserId: string;
   let testToken: string;
@@ -27,14 +28,9 @@ describe('API Endpoints', () => {
     );
     
     // Create Fastify server
-    const appModule = await import('./index');
     server = Fastify({
       logger: false,
     });
-    
-    // Initialize server (this will set up routes)
-    // We need to manually set up the server since we can't import the running one
-    const { default: app } = await import('./index');
     
     // For testing, we'll create a minimal server with the same routes
     await server.register(require('@fastify/cors'), { origin: true });
@@ -44,7 +40,7 @@ describe('API Endpoints', () => {
     server.get('/health', async () => ({ status: 'ok' }));
     
     // Auth routes
-    server.post('/api/v1/auth/register', async (request, reply) => {
+    server.post('/api/v1/auth/register', async (request: any, reply: any) => {
       const { name, email, password, role } = request.body as any;
       const existingUser = await db.get('SELECT id FROM users WHERE email = ?', email);
       if (existingUser) {
@@ -59,7 +55,7 @@ describe('API Endpoints', () => {
       return { id: userId, name, email, role };
     });
     
-    server.post('/api/v1/auth/login', async (request, reply) => {
+    server.post('/api/v1/auth/login', async (request: any, reply: any) => {
       const { email, password } = request.body as any;
       const user = await db.get('SELECT * FROM users WHERE email = ?', email);
       if (!user) {
@@ -77,7 +73,7 @@ describe('API Endpoints', () => {
     });
     
     // Questionnaire routes
-    server.get('/api/v1/questionnaires', async (request) => {
+    server.get('/api/v1/questionnaires', async (request: any) => {
       const userId = (request as any).user.userId;
       return await db.all(
         'SELECT * FROM questionnaires WHERE created_by = ? ORDER BY created_at DESC',
@@ -85,7 +81,7 @@ describe('API Endpoints', () => {
       );
     });
     
-    server.post('/api/v1/questionnaires', async (request, reply) => {
+    server.post('/api/v1/questionnaires', async (request: any, reply: any) => {
       const userId = (request as any).user.userId;
       const { name, description, isTemplate } = request.body as any;
       const questionnaireId = uuidv4();
@@ -96,7 +92,7 @@ describe('API Endpoints', () => {
       return reply.code(201).send({ id: questionnaireId, name, description, isTemplate });
     });
     
-    server.get('/api/v1/questionnaires/:id', async (request, reply) => {
+    server.get('/api/v1/questionnaires/:id', async (request: any, reply: any) => {
       const { id } = request.params as any;
       const userId = (request as any).user.userId;
       const questionnaire = await db.get(
@@ -110,7 +106,7 @@ describe('API Endpoints', () => {
     });
     
     // Questionnaire Answers routes
-    server.post('/api/v1/questionnaire-answers', async (request, reply) => {
+    server.post('/api/v1/questionnaire-answers', async (request: any, reply: any) => {
       const userId = (request as any).user.userId;
       const { questionnaireId, answers, version } = request.body as any;
       const questionnaire = await db.get(
@@ -128,7 +124,7 @@ describe('API Endpoints', () => {
       return reply.code(201).send({ id: answersId, questionnaireId, version });
     });
     
-    server.get('/api/v1/questionnaire-answers', async (request) => {
+    server.get('/api/v1/questionnaire-answers', async (request: any) => {
       const userId = (request as any).user.userId;
       return await db.all(
         'SELECT qa.*, q.name as questionnaire_name FROM questionnaire_answers qa JOIN questionnaires q ON qa.questionnaire_id = q.id WHERE qa.created_by = ? ORDER BY qa.created_at DESC',
@@ -136,7 +132,7 @@ describe('API Endpoints', () => {
       );
     });
     
-    server.get('/api/v1/questionnaire-answers/:id', async (request, reply) => {
+    server.get('/api/v1/questionnaire-answers/:id', async (request: any, reply: any) => {
       const { id } = request.params as any;
       const userId = (request as any).user.userId;
       const answers = await db.get(
@@ -150,7 +146,7 @@ describe('API Endpoints', () => {
     });
     
     // Shortlist routes
-    server.post('/api/v1/shortlist', async (request, reply) => {
+    server.post('/api/v1/shortlist', async (request: any, reply: any) => {
       const userId = (request as any).user.userId;
       const { questionnaireAnswersId, version } = request.body as any;
       const answers = await db.get(
@@ -185,7 +181,7 @@ describe('API Endpoints', () => {
       return { id: shortlistId, requirements: mockRequirements, version: version || '1.0' };
     });
     
-    server.get('/api/v1/shortlist/:id', async (request, reply) => {
+    server.get('/api/v1/shortlist/:id', async (request: any, reply: any) => {
       const { id } = request.params as any;
       const userId = (request as any).user.userId;
       const shortlist = await db.get(

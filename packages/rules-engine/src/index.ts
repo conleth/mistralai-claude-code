@@ -8,8 +8,8 @@ import type {
   QuestionnaireAnswers,
   RequirementRule,
   ShortlistedRequirement,
-  StandardRequirement,
 } from '@security-rat/types';
+import type { StandardRequirement } from '@security-rat/standards';
 
 /**
  * Compute derived attributes from questionnaire answers
@@ -135,7 +135,9 @@ export function evaluateRules(
           tags: requirement.tags,
           rationale,
           derivedFrom: {
-            questionnaireAnswers,
+            questionnaireAnswers: Object.fromEntries(
+              Object.entries(questionnaireAnswers).map(([key, value]) => [key, Array.isArray(value) ? value.join(',') : value])
+            ) as Record<string, string>,
             ruleIds: matchedRules.map(r => r.id),
           },
           status: 'pending',
@@ -145,6 +147,42 @@ export function evaluateRules(
   }
 
   return shortlisted;
+}
+
+/**
+ * Generate a shortlist from questionnaire answers
+ * 
+ * This is a convenience wrapper around applyRules that loads the default rules
+ * and returns a promise for easier use in async contexts.
+ */
+export async function generateShortlist(
+  questionnaireAnswers: QuestionnaireAnswers
+): Promise<ShortlistedRequirement[]> {
+  const { loadStandard } = await import('@security-rat/standards');
+  
+  // Load ASVS standard
+  const asvsRequirements = await loadStandard('ASVS', '5.0');
+  
+  // Use default rules based on questionnaire answers
+  const rules: RequirementRule[] = [
+    {
+      id: 'asvs-level',
+      standard: 'ASVS',
+      requirementId: '*', // Apply to all requirements
+      conditions: [
+        {
+          field: 'recommendedASVSLevel',
+          operator: 'equals',
+          value: Array.isArray(questionnaireAnswers['recommendedASVSLevel']) 
+            ? questionnaireAnswers['recommendedASVSLevel'][0] || 'L1'
+            : (questionnaireAnswers['recommendedASVSLevel'] || 'L1'),
+        },
+      ],
+      rationale: 'Selected based on application security requirements',
+    },
+  ];
+  
+  return applyRules(asvsRequirements, rules, questionnaireAnswers);
 }
 
 /**

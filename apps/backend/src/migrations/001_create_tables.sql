@@ -92,3 +92,33 @@ CREATE INDEX IF NOT EXISTS idx_requirement_status_shortlist ON requirement_statu
 CREATE INDEX IF NOT EXISTS idx_comments_shortlist ON comments(shortlist_id);
 CREATE INDEX IF NOT EXISTS idx_audit_log_user ON audit_log(user_id);
 CREATE INDEX IF NOT EXISTS idx_audit_log_entity ON audit_log(entity_type, entity_id);
+CREATE INDEX IF NOT EXISTS idx_external_references_shortlist ON external_references(shortlist_id);
+CREATE INDEX IF NOT EXISTS idx_external_references_system ON external_references(external_system);
+
+-- Create Webhook table
+CREATE TABLE IF NOT EXISTS webhooks (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  url TEXT NOT NULL,
+  event_types TEXT NOT NULL,
+  created_by TEXT NOT NULL,
+  is_active BOOLEAN DEFAULT TRUE,
+  secret TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (created_by) REFERENCES users(id)
+);
+
+-- Create Webhook Logs table
+CREATE TABLE IF NOT EXISTS webhook_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  webhook_id TEXT NOT NULL,
+  event_type TEXT NOT NULL,
+  payload JSON NOT NULL,
+  status TEXT NOT NULL,
+  response_status INTEGER,
+  response_body TEXT,
+  error_message TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (webhook_id) REFERENCES webhooks(id)
+);

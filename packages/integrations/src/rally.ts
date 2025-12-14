@@ -181,9 +181,9 @@ export class RallyAdapter {
     } catch (error) {
       if (error instanceof ApiError) {
         throw new IntegrationError(
-          `Failed to create Rally ticket for requirement ${requirement.id}: ${error.message}`,
+          `Failed to create Rally ticket for requirement ${requirement.requirementId}: ${error.message}`,
           'TICKET_CREATION_FAILED',
-          { requirementId: requirement.id, error: error.details }
+          { requirementId: requirement.requirementId, error: error.details }
         );
       }
       throw error;
@@ -224,7 +224,7 @@ export class RallyAdapter {
     return `## Security Requirement
 
 **ID**: ${requirement.requirementId}
-**Standard**: ${requirement.standard.toUpperCase()} ${requirement.version}
+**Standard**: ${requirement.standard.toUpperCase()} ${requirement.standardVersion}
 **Level**: ${requirement.level}
 **Category**: ${requirement.category}
 
