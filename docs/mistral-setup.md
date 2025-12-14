@@ -39,5 +39,21 @@ curl -sS -X POST http://127.0.0.1:4000/v1/messages?beta=true \
 - Hook: `tools/litellm_hooks.py` removes `context_management` and drops all `assistant` role stubs before forwarding (prevents Mistral 400 `invalid_request_message_order`).
 - Startup helper: `tools/start-litellm.sh` loads `.env`, sets `PYTHONPATH`, enforces `LITELLM_MASTER_KEY`, then runs LiteLLM.
 
+## Dev container + `--dangerously-skip-permissions`
+- Devcontainer config: `.devcontainer/devcontainer.json` (Node 20, Python 3.10, installs `claude` CLI and `litellm`).
+- Inside the container:
+  ```bash
+  source .env  # loads MISTRAL_API_KEY (not committed)
+  PYTHONPATH="$(pwd)/tools:$(pwd)" ./tools/start-litellm.sh --detailed_debug
+  ```
+  New terminal in the container:
+  ```bash
+  export ANTHROPIC_BASE_URL=http://127.0.0.1:4000
+  export ANTHROPIC_API_KEY=lcl-local
+  export ANTHROPIC_AUTH_TOKEN=lcl-local
+  claude --dangerously-skip-permissions
+  ```
+- The flag only affects the container; host remains isolated. Keep secrets in `.env`, not baked into the image.
+
 ## If you see Anthropic branding in the CLI
-The CLI UI always says “Claude/Sonnet” because of its built-in prompt. The backend call is still Mistral if the verification steps above pass. Use the curl check or the LiteLLM logs to confirm.***
+The CLI UI always says “Claude/Sonnet” because of its built-in prompt. The backend call is still Mistral if the verification steps above pass. Use the curl check or the LiteLLM logs to confirm.
