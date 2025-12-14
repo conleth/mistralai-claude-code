@@ -12,10 +12,21 @@ cd mistralai-claude-code
 ### 2. Run Initialization Checks
 
 ```bash
+# Run the init script to verify setup
 bash tools/init.sh
+
+# Or use the npm script
+npm run init
 ```
 
-This will verify your environment and project setup.
+The init script performs comprehensive checks:
+- Verifies Node.js and npm versions
+- Checks project structure and required files
+- Validates implementation files (types, rules-engine, standards, questionnaire)
+- Checks dependencies
+- Creates a state snapshot file
+
+This will verify your environment and project setup, and provide guidance on next steps.
 
 ### 3. Install Dependencies
 
