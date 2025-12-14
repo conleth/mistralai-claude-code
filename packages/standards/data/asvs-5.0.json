@@ -1,0 +1,291 @@
+{
+  "version": "5.0.0",
+  "requirements": [
+    {
+      "id": "v5.0.0-1.1.1",
+      "title": "Inventory of authorized and unauthorized software",
+      "description": "An inventory of authorized and unauthorized software should be maintained. This includes software on all systems, including servers, workstations, network devices, and mobile devices.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["inventory", "software", "configuration-management"],
+      "metadata": {
+        "cwe": ["CWE-94", "CWE-778"],
+        "nist": ["CM-8", "SI-7"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-1.1.2",
+      "title": "Test for unauthorized software",
+      "description": "Systems should be tested for unauthorized software. This includes testing for software that is not approved or that is not properly licensed.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["inventory", "software", "testing"],
+      "metadata": {
+        "cwe": ["CWE-778"],
+        "nist": ["SI-7"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-1.1.3",
+      "title": "Verify software inventory",
+      "description": "The software inventory should be verified on a regular basis to ensure accuracy. This includes verifying that all software is properly licensed and authorized.",
+      "level": "L2",
+      "category": "V1",
+      "tags": ["inventory", "software", "verification"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["CM-8"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-1.2.1",
+      "title": "Inventory of authorized and unauthorized hardware",
+      "description": "An inventory of authorized and unauthorized hardware should be maintained. This includes hardware on all systems, including servers, workstations, network devices, and mobile devices.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["inventory", "hardware", "configuration-management"],
+      "metadata": {
+        "cwe": ["CWE-94", "CWE-778"],
+        "nist": ["CM-8", "SI-7"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-1.2.2",
+      "title": "Test for unauthorized hardware",
+      "description": "Systems should be tested for unauthorized hardware. This includes testing for hardware that is not approved or that is not properly licensed.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["inventory", "hardware", "testing"],
+      "metadata": {
+        "cwe": ["CWE-778"],
+        "nist": ["SI-7"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-1.3.1",
+      "title": "Inventory of authorized and unauthorized network devices",
+      "description": "An inventory of authorized and unauthorized network devices should be maintained. This includes routers, switches, firewalls, and other network infrastructure.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["inventory", "network", "configuration-management"],
+      "metadata": {
+        "cwe": ["CWE-94", "CWE-778"],
+        "nist": ["CM-8", "SI-7"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-1.3.2",
+      "title": "Test for unauthorized network devices",
+      "description": "Network devices should be tested for unauthorized devices. This includes testing for devices that are not approved or that are not properly licensed.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["inventory", "network", "testing"],
+      "metadata": {
+        "cwe": ["CWE-778"],
+        "nist": ["SI-7"],
+        "owasp": ["A6: Security Misconfiguration"]
+      }
+    },
+    {
+      "id": "v5.0.0-2.1.1",
+      "title": "Verify architecture diagrams",
+      "description": "Architecture diagrams should be verified to ensure they accurately represent the current system architecture. This includes verifying that all components are properly documented and that the diagrams are up-to-date.",
+      "level": "L1",
+      "category": "V2",
+      "tags": ["architecture", "design", "verification"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["PL-2"],
+        "owasp": ["A1: Broken Access Control"]
+      }
+    },
+    {
+      "id": "v5.0.0-2.1.2",
+      "title": "Review architecture for security controls",
+      "description": "The architecture should be reviewed to ensure that appropriate security controls are in place. This includes reviewing the architecture for authentication, authorization, encryption, and logging.",
+      "level": "L2",
+      "category": "V2",
+      "tags": ["architecture", "design", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3", "AU-2"],
+        "owasp": ["A2: Cryptographic Failures"]
+      }
+    },
+    {
+      "id": "v5.0.0-2.1.3",
+      "title": "Verify security architecture",
+      "description": "The security architecture should be verified to ensure that it is properly implemented and that all security controls are in place. This includes verifying that the architecture meets the requirements of the organization's security policy.",
+      "level": "L3",
+      "category": "V2",
+      "tags": ["architecture", "design", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3", "AU-2"],
+        "owasp": ["A2: Cryptographic Failures"]
+      }
+    },
+    {
+      "id": "v5.0.0-2.2.1",
+      "title": "Verify data flow diagrams",
+      "description": "Data flow diagrams should be verified to ensure they accurately represent the current data flows. This includes verifying that all data flows are properly documented and that the diagrams are up-to-date.",
+      "level": "L1",
+      "category": "V2",
+      "tags": ["data-flow", "design", "verification"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["PL-2"],
+        "owasp": ["A1: Broken Access Control"]
+      }
+    },
+    {
+      "id": "v5.0.0-2.2.2",
+      "title": "Review data flows for security controls",
+      "description": "Data flows should be reviewed to ensure that appropriate security controls are in place. This includes reviewing the data flows for authentication, authorization, encryption, and logging.",
+      "level": "L2",
+      "category": "V2",
+      "tags": ["data-flow", "design", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3", "AU-2"],
+        "owasp": ["A2: Cryptographic Failures"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.1.1",
+      "title": "Verify authentication mechanism",
+      "description": "The authentication mechanism should be verified to ensure it is properly implemented. This includes verifying that the authentication mechanism meets the requirements of the organization's security policy.",
+      "level": "L1",
+      "category": "V3",
+      "tags": ["authentication", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.1.2",
+      "title": "Test authentication mechanism",
+      "description": "The authentication mechanism should be tested to ensure it is properly implemented. This includes testing the authentication mechanism for vulnerabilities such as brute force attacks, credential stuffing, and session fixation.",
+      "level": "L2",
+      "category": "V3",
+      "tags": ["authentication", "security-controls", "testing"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.1.3",
+      "title": "Verify multi-factor authentication",
+      "description": "Multi-factor authentication should be verified to ensure it is properly implemented. This includes verifying that multi-factor authentication is required for all users and that it is properly configured.",
+      "level": "L3",
+      "category": "V3",
+      "tags": ["authentication", "multi-factor", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.2.1",
+      "title": "Verify session management",
+      "description": "Session management should be verified to ensure it is properly implemented. This includes verifying that sessions are properly managed and that session tokens are properly protected.",
+      "level": "L1",
+      "category": "V3",
+      "tags": ["session", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-384"],
+        "nist": ["AC-12"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.2.2",
+      "title": "Test session management",
+      "description": "Session management should be tested to ensure it is properly implemented. This includes testing for session fixation, session hijacking, and session timeout.",
+      "level": "L2",
+      "category": "V3",
+      "tags": ["session", "security-controls", "testing"],
+      "metadata": {
+        "cwe": ["CWE-384"],
+        "nist": ["AC-12"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.3.1",
+      "title": "Verify password policies",
+      "description": "Password policies should be verified to ensure they meet the requirements of the organization's security policy. This includes verifying that passwords are properly stored and that password policies are properly enforced.",
+      "level": "L1",
+      "category": "V3",
+      "tags": ["password", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-256"],
+        "nist": ["IA-5"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-3.3.2",
+      "title": "Test password policies",
+      "description": "Password policies should be tested to ensure they are properly implemented. This includes testing for weak passwords, password reuse, and password storage.",
+      "level": "L2",
+      "category": "V3",
+      "tags": ["password", "security-controls", "testing"],
+      "metadata": {
+        "cwe": ["CWE-256"],
+        "nist": ["IA-5"],
+        "owasp": ["A2: Broken Authentication"]
+      }
+    },
+    {
+      "id": "v5.0.0-4.1.1",
+      "title": "Verify authorization mechanism",
+      "description": "The authorization mechanism should be verified to ensure it is properly implemented. This includes verifying that the authorization mechanism meets the requirements of the organization's security policy.",
+      "level": "L1",
+      "category": "V4",
+      "tags": ["authorization", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-285"],
+        "nist": ["AC-3"],
+        "owasp": ["A1: Broken Access Control"]
+      }
+    },
+    {
+      "id": "v5.0.0-4.1.2",
+      "title": "Test authorization mechanism",
+      "description": "The authorization mechanism should be tested to ensure it is properly implemented. This includes testing for privilege escalation, horizontal privilege escalation, and vertical privilege escalation.",
+      "level": "L2",
+      "category": "V4",
+      "tags": ["authorization", "security-controls", "testing"],
+      "metadata": {
+        "cwe": ["CWE-285"],
+        "nist": ["AC-3"],
+        "owasp": ["A1: Broken Access Control"]
+      }
+    },
+    {
+      "id": "v5.0.0-4.1.3",
+      "title": "Verify role-based access control",
+      "description": "Role-based access control should be verified to ensure it is properly implemented. This includes verifying that roles are properly defined and that access control policies are properly enforced.",
+      "level": "L3",
+      "category": "V4",
+      "tags": ["authorization", "rbac", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-285"],
+        "nist": ["AC-3"],
+        "owasp": ["A1: Broken Access Control"]
+      }
+    }
+  ]
+}

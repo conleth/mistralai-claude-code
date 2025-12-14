@@ -1,0 +1,252 @@
+{
+  "version": "1.0",
+  "requirements": [
+    {
+      "id": "V1.1.1",
+      "title": "Define security requirements for the pipeline",
+      "description": "Security requirements for the CI/CD pipeline should be defined and documented. This includes requirements for authentication, authorization, encryption, and logging.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["requirements", "security", "pipeline", "planning"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["PL-2"],
+        "owasp": ["C1: Insecure Interactions Between Components"]
+      }
+    },
+    {
+      "id": "V1.1.2",
+      "title": "Define pipeline architecture",
+      "description": "The architecture of the CI/CD pipeline should be defined and documented. This includes the components, their interactions, and the data flows.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["architecture", "pipeline", "planning"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["PL-2"],
+        "owasp": ["C1: Insecure Interactions Between Components"]
+      }
+    },
+    {
+      "id": "V1.1.3",
+      "title": "Define pipeline security controls",
+      "description": "Security controls for the CI/CD pipeline should be defined and documented. This includes controls for authentication, authorization, encryption, and logging.",
+      "level": "L2",
+      "category": "V1",
+      "tags": ["security-controls", "pipeline", "planning"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AC-3", "AU-2"],
+        "owasp": ["C2: Insecure Dependencies"]
+      }
+    },
+    {
+      "id": "V1.2.1",
+      "title": "Define code review requirements",
+      "description": "Requirements for code reviews should be defined and documented. This includes requirements for who performs the reviews, what is reviewed, and how the reviews are documented.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["code-review", "requirements", "planning"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["SA-11"],
+        "owasp": ["C3: Insecure Build Pipeline"]
+      }
+    },
+    {
+      "id": "V1.2.2",
+      "title": "Define testing requirements",
+      "description": "Requirements for testing should be defined and documented. This includes requirements for unit tests, integration tests, and security tests.",
+      "level": "L1",
+      "category": "V1",
+      "tags": ["testing", "requirements", "planning"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["SA-11"],
+        "owasp": ["C4: Insecure Production Deployment"]
+      }
+    },
+    {
+      "id": "V2.1.1",
+      "title": "Implement secure coding standards",
+      "description": "Secure coding standards should be implemented and enforced. This includes standards for input validation, output encoding, authentication, and authorization.",
+      "level": "L1",
+      "category": "V2",
+      "tags": ["secure-coding", "development", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-20", "CWE-79"],
+        "nist": ["SA-8"],
+        "owasp": ["C5: Excessive Permissions"]
+      }
+    },
+    {
+      "id": "V2.1.2",
+      "title": "Implement static analysis",
+      "description": "Static analysis tools should be implemented to detect security vulnerabilities in the code. This includes tools for detecting SQL injection, XSS, and other common vulnerabilities.",
+      "level": "L1",
+      "category": "V2",
+      "tags": ["static-analysis", "development", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-79", "CWE-89"],
+        "nist": ["SA-11"],
+        "owasp": ["C6: Insecure Defaults"]
+      }
+    },
+    {
+      "id": "V2.1.3",
+      "title": "Implement dynamic analysis",
+      "description": "Dynamic analysis tools should be implemented to detect security vulnerabilities in running applications. This includes tools for detecting SQL injection, XSS, and other common vulnerabilities.",
+      "level": "L2",
+      "category": "V2",
+      "tags": ["dynamic-analysis", "development", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-79", "CWE-89"],
+        "nist": ["SA-11"],
+        "owasp": ["C7: Insecure Third Party Components"]
+      }
+    },
+    {
+      "id": "V2.2.1",
+      "title": "Implement dependency scanning",
+      "description": "Dependency scanning tools should be implemented to detect vulnerable dependencies. This includes tools for detecting outdated libraries, known vulnerabilities, and license issues.",
+      "level": "L1",
+      "category": "V2",
+      "tags": ["dependency-scanning", "development", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-1104"],
+        "nist": ["SA-10"],
+        "owasp": ["C2: Insecure Dependencies"]
+      }
+    },
+    {
+      "id": "V2.2.2",
+      "title": "Update dependencies",
+      "description": "Dependencies should be updated to the latest versions to fix known vulnerabilities. This includes updating libraries, frameworks, and other dependencies.",
+      "level": "L1",
+      "category": "V2",
+      "tags": ["dependencies", "development", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-1104"],
+        "nist": ["SA-10"],
+        "owasp": ["C2: Insecure Dependencies"]
+      }
+    },
+    {
+      "id": "V3.1.1",
+      "title": "Implement build verification",
+      "description": "Build verification should be implemented to ensure that builds are consistent and reproducible. This includes verifying that the build process produces the expected output.",
+      "level": "L1",
+      "category": "V3",
+      "tags": ["build", "integration", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["CM-8"],
+        "owasp": ["C3: Insecure Build Pipeline"]
+      }
+    },
+    {
+      "id": "V3.1.2",
+      "title": "Sign build artifacts",
+      "description": "Build artifacts should be signed to ensure their integrity. This includes signing executables, libraries, and other artifacts.",
+      "level": "L2",
+      "category": "V3",
+      "tags": ["build", "integration", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-345"],
+        "nist": ["SC-12"],
+        "owasp": ["C3: Insecure Build Pipeline"]
+      }
+    },
+    {
+      "id": "V3.1.3",
+      "title": "Verify build artifacts",
+      "description": "Build artifacts should be verified to ensure their integrity. This includes verifying signatures, checksums, and other integrity checks.",
+      "level": "L3",
+      "category": "V3",
+      "tags": ["build", "integration", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-345"],
+        "nist": ["SC-12"],
+        "owasp": ["C3: Insecure Build Pipeline"]
+      }
+    },
+    {
+      "id": "V4.1.1",
+      "title": "Implement release verification",
+      "description": "Release verification should be implemented to ensure that releases are consistent and reproducible. This includes verifying that the release process produces the expected output.",
+      "level": "L1",
+      "category": "V4",
+      "tags": ["release", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["CM-8"],
+        "owasp": ["C4: Insecure Production Deployment"]
+      }
+    },
+    {
+      "id": "V4.1.2",
+      "title": "Sign release artifacts",
+      "description": "Release artifacts should be signed to ensure their integrity. This includes signing executables, libraries, and other artifacts.",
+      "level": "L2",
+      "category": "V4",
+      "tags": ["release", "security-controls"],
+      "metadata": {
+        "cwe": ["CWE-345"],
+        "nist": ["SC-12"],
+        "owasp": ["C4: Insecure Production Deployment"]
+      }
+    },
+    {
+      "id": "V4.1.3",
+      "title": "Verify release artifacts",
+      "description": "Release artifacts should be verified to ensure their integrity. This includes verifying signatures, checksums, and other integrity checks.",
+      "level": "L3",
+      "category": "V4",
+      "tags": ["release", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-345"],
+        "nist": ["SC-12"],
+        "owasp": ["C4: Insecure Production Deployment"]
+      }
+    },
+    {
+      "id": "V5.1.1",
+      "title": "Implement deployment verification",
+      "description": "Deployment verification should be implemented to ensure that deployments are consistent and reproducible. This includes verifying that the deployment process produces the expected output.",
+      "level": "L1",
+      "category": "V5",
+      "tags": ["deployment", "operate", "security-controls", "verification"],
+      "metadata": {
+        "cwe": ["CWE-94"],
+        "nist": ["CM-8"],
+        "owasp": ["C8: Insecure Data Management"]
+      }
+    },
+    {
+      "id": "V5.1.2",
+      "title": "Monitor deployments",
+      "description": "Deployments should be monitored to detect anomalies and security issues. This includes monitoring for unauthorized deployments, failed deployments, and other issues.",
+      "level": "L2",
+      "category": "V5",
+      "tags": ["deployment", "operate", "security-controls", "monitoring"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["AU-2"],
+        "owasp": ["C8: Insecure Data Management"]
+      }
+    },
+    {
+      "id": "V5.1.3",
+      "title": "Roll back deployments",
+      "description": "Deployments should be able to be rolled back to a previous version in case of issues. This includes having a rollback plan and testing the rollback process.",
+      "level": "L3",
+      "category": "V5",
+      "tags": ["deployment", "operate", "security-controls", "roll-back"],
+      "metadata": {
+        "cwe": ["CWE-306"],
+        "nist": ["CP-10"],
+        "owasp": ["C9: Insecure Secrets Management"]
+      }
+    }
+  ]
+}
