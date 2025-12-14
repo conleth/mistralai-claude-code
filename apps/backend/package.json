@@ -13,9 +13,16 @@
     "@security-rat/types": "*",
     "@security-rat/rules-engine": "*",
     "@security-rat/standards": "*",
+    "@security-rat/questionnaire": "*",
     "fastify": "^5.2.0",
     "@fastify/cors": "^10.0.1",
-    "zod": "^3.24.1"
+    "@fastify/jwt": "^8.0.1",
+    "fastify-plugin": "^5.0.0",
+    "sqlite": "^5.1.1",
+    "sqlite3": "^5.1.7",
+    "zod": "^3.24.1",
+    "bcryptjs": "^2.4.3",
+    "uuid": "^10.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
