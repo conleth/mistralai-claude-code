@@ -51,7 +51,7 @@ class ProxyHookStripClaudeExtras(CustomLogger):
     @staticmethod
     def _convert_tools(tools):
         if not isinstance(tools, list):
-            return tools
+            return None
         converted = []
         for tool in tools:
             if not isinstance(tool, dict):
@@ -71,6 +71,19 @@ class ProxyHookStripClaudeExtras(CustomLogger):
                 }
             )
         return converted or None
+
+    @staticmethod
+    def _ensure_last_role_ok(messages: list) -> list:
+        """Ensure last role is acceptable to Mistral: user/tool or assistant with prefix."""
+        if not isinstance(messages, list):
+            return messages
+        while messages and messages[-1].get("role") == "assistant":
+            last = messages[-1]
+            if last.get("tool_calls"):
+                last["prefix"] = True
+                break
+            messages.pop()
+        return messages
 
     @classmethod
     def _convert_messages(cls, data: dict) -> dict:
@@ -143,9 +156,7 @@ class ProxyHookStripClaudeExtras(CustomLogger):
                     elif isinstance(b, str):
                         texts.append(b)
 
-                if texts:
-                    converted.append({"role": "user", "content": "\n".join(texts)})
-
+                # Emit tool results first so the flow is: assistant(tool_calls) -> tool -> user
                 for tr in tool_results:
                     converted.append(
                         {
@@ -156,6 +167,9 @@ class ProxyHookStripClaudeExtras(CustomLogger):
                         }
                     )
 
+                if texts:
+                    converted.append({"role": "user", "content": "\n".join(texts)})
+
             elif role == "system":
                 converted.append({"role": "system", "content": cls._collapse_text_blocks(blocks)})
             else:
@@ -163,7 +177,11 @@ class ProxyHookStripClaudeExtras(CustomLogger):
                 converted.append(m)
 
         if converted:
-            data["messages"] = converted
+            converted = cls._ensure_last_role_ok(converted)
+            if converted:
+                data["messages"] = converted
+            else:
+                data.pop("messages", None)
         return data
 
     async def async_pre_call_hook(
@@ -186,10 +204,21 @@ class ProxyHookStripClaudeExtras(CustomLogger):
         # data.pop("thinking", None)
         # data.pop("reasoning", None)
 
-        # Translate Anthropic message/tool shapes to Mistral/OpenAI chat format
-        # only for chat completions.
-        if call_type == "completion":
-            data["tools"] = self._convert_tools(data.get("tools"))
+        print(f"[ProxyHookStripClaudeExtras] call_type={call_type} messages={len(data.get('messages', []))}")
+
+        # If we are in Anthropic /v1/messages pipeline, let LiteLLM do its own translation.
+        if call_type == "anthropic_messages":
+            if isinstance(data.get("messages"), list):
+                data["messages"] = self._ensure_last_role_ok(data["messages"])
+            return data
+
+        # Otherwise translate for OpenAI/Mistral-style chat payloads.
+        if isinstance(data.get("messages"), list):
+            converted_tools = self._convert_tools(data.get("tools"))
+            if converted_tools is None:
+                data.pop("tools", None)
+            else:
+                data["tools"] = converted_tools
             data = self._convert_messages(data)
 
         return data
@@ -197,3 +226,20 @@ class ProxyHookStripClaudeExtras(CustomLogger):
 
 # Module-level instance LiteLLM will import per docs
 proxy_handler_instance = ProxyHookStripClaudeExtras()
+
+# ---------------------------------------------------------------------------
+# Stub telemetry endpoint to silence /api/event_logging/batch 404 noise.
+# This file is already imported by LiteLLM via callbacks, so we register the
+# route here exactly once without touching LiteLLM upstream code.
+# ---------------------------------------------------------------------------
+try:
+    from litellm.proxy.proxy_server import app as _litellm_app
+except Exception:
+    _litellm_app = None
+
+if _litellm_app and not getattr(_litellm_app.state, "has_event_logging_stub", False):
+    @_litellm_app.post("/api/event_logging/batch")
+    async def _event_logging_stub():
+        return {"status": "ok"}
+
+    _litellm_app.state.has_event_logging_stub = True
