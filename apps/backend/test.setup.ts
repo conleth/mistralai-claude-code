@@ -15,7 +15,7 @@ vi.mock('fs', async () => {
   const actual = await vi.importActual('fs');
   return {
     ...actual,
-    existsSync: vi.fn(),
+    existsSync: vi.fn(() => false),
     unlinkSync: vi.fn(),
     mkdirSync: vi.fn(),
     readFileSync: actual.readFileSync,
@@ -30,6 +30,40 @@ vi.mock('path', async () => {
     join: actual.join,
     basename: actual.basename,
     dirname: actual.dirname,
+  };
+});
+
+// Mock sqlite3 to prevent database initialization
+vi.mock('sqlite3', () => {
+  return {
+    Database: class MockDatabase {
+      static open() {
+        return Promise.resolve({
+          close: vi.fn(),
+          exec: vi.fn(),
+          get: vi.fn(),
+          all: vi.fn(),
+          run: vi.fn(),
+        });
+      }
+    },
+    OPEN_READWRITE: 1,
+    OPEN_CREATE: 2,
+  };
+});
+
+// Mock sqlite to prevent database initialization
+vi.mock('sqlite', async () => {
+  const actual = await vi.importActual('sqlite');
+  return {
+    ...actual,
+    open: vi.fn(() => Promise.resolve({
+      close: vi.fn(),
+      exec: vi.fn(),
+      get: vi.fn(),
+      all: vi.fn(),
+      run: vi.fn(),
+    })),
   };
 });
 

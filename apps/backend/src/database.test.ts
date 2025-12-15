@@ -3,13 +3,14 @@
  */
 
 import { describe, it, beforeAll, afterAll, expect, beforeEach, afterEach } from 'vitest';
-import { initializeDatabase, closeDatabase } from './database.js';
-import { Database } from 'sqlite';
+import { initializeDatabase, closeDatabase } from './database';
+import { Database, open } from 'sqlite';
+import type { Database as SqliteDatabase } from 'sqlite';
 import fs from 'fs';
 import path from 'path';
 
 describe('Database', () => {
-  let db: Database;
+  let db: SqliteDatabase;
   const testDbPath = path.join(process.cwd(), 'data', 'test-security-rat.db');
 
   // Clean up test database before tests
@@ -22,12 +23,15 @@ describe('Database', () => {
   // Initialize database before each test
   beforeEach(async () => {
     if (db) {
-      await closeDatabase(db);
+      await db.close();
     }
     
     // Create a test-specific initialization
     const testInit = async () => {
-      const testDb = new Database(testDbPath);
+      const testDb = await open({
+        filename: testDbPath,
+        driver: Database,
+      });
       
       // Run migrations manually for testing
       await testDb.exec(
@@ -43,7 +47,7 @@ describe('Database', () => {
   // Clean up after each test
   afterEach(async () => {
     if (db) {
-      await closeDatabase(db);
+      await db.close();
     }
   });
 

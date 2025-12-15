@@ -2,8 +2,9 @@
  * Database connection and migration utility
  */
 
-import { Database } from 'sqlite3';
+import sqlite3 from 'sqlite3';
 import { open, Database as SqliteDatabase } from 'sqlite';
+import { Database } from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
 
@@ -58,7 +59,7 @@ async function runMigrations(db: SqliteDatabase): Promise<void> {
   }
   
   // Get already applied migrations
-  const appliedMigrations = await db.all<string>(
+  const appliedMigrations: Array<{ name: string }> = await db.all(
     'SELECT name FROM migrations ORDER BY id'
   );
   
@@ -69,7 +70,7 @@ async function runMigrations(db: SqliteDatabase): Promise<void> {
   for (const file of migrationFiles) {
     const migrationName = path.basename(file, '.sql');
     
-    if (!appliedMigrations.some(m => m.name === migrationName)) {
+    if (!appliedMigrations.some((m: { name: string }) => m.name === migrationName)) {
       console.log(`Applying migration: ${migrationName}`);
       
       const migrationPath = path.join(MIGRATIONS_DIR, file);

@@ -12,7 +12,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
 // Import types from packages
-import type { QuestionnaireAnswers } from '@security-rat/types';
+// import type { QuestionnaireAnswers } from '@security-rat/types';
 
 const server = Fastify({
   logger: true,
@@ -23,7 +23,7 @@ let db;
 try {
   db = await initializeDatabase();
   server.decorate('db', db);
-} catch (error) {
+} catch (error: any) {
   server.log.error('Failed to initialize database:', error);
   process.exit(1);
 }
@@ -133,7 +133,7 @@ server.post('/api/v1/auth/login', async (request, reply) => {
 });
 
 // Questionnaire endpoints
-server.get('/api/v1/questionnaires', async (request) => {
+server.get('/api/v1/questionnaires', async (request: any) => {
   const userId = request.user.userId;
   
   const questionnaires = await db.all(
@@ -144,7 +144,7 @@ server.get('/api/v1/questionnaires', async (request) => {
   return questionnaires;
 });
 
-server.post('/api/v1/questionnaires', async (request, reply) => {
+server.post('/api/v1/questionnaires', async (request: any, reply: any) => {
   const userId = request.user.userId;
   
   const schema = z.object({
@@ -170,7 +170,7 @@ server.post('/api/v1/questionnaires', async (request, reply) => {
   return reply.code(201).send({ id: questionnaireId, name, description, isTemplate });
 });
 
-server.get('/api/v1/questionnaires/:id', async (request, reply) => {
+server.get('/api/v1/questionnaires/:id', async (request: any, reply: any) => {
   const { id } = request.params as { id: string };
   const userId = request.user.userId;
   
@@ -187,7 +187,7 @@ server.get('/api/v1/questionnaires/:id', async (request, reply) => {
 });
 
 // Questionnaire Answers endpoints
-server.post('/api/v1/questionnaire-answers', async (request, reply) => {
+server.post('/api/v1/questionnaire-answers', async (request: any, reply: any) => {
   const userId = request.user.userId;
   
   const schema = z.object({
@@ -222,7 +222,7 @@ server.post('/api/v1/questionnaire-answers', async (request, reply) => {
   return reply.code(201).send({ id: answersId, questionnaireId, version });
 });
 
-server.get('/api/v1/questionnaire-answers', async (request) => {
+server.get('/api/v1/questionnaire-answers', async (request: any) => {
   const userId = request.user.userId;
   
   const answers = await db.all(
@@ -233,7 +233,7 @@ server.get('/api/v1/questionnaire-answers', async (request) => {
   return answers;
 });
 
-server.get('/api/v1/questionnaire-answers/:id', async (request, reply) => {
+server.get('/api/v1/questionnaire-answers/:id', async (request: any, reply: any) => {
   const { id } = request.params as { id: string };
   const userId = request.user.userId;
   
@@ -250,7 +250,7 @@ server.get('/api/v1/questionnaire-answers/:id', async (request, reply) => {
 });
 
 // Shortlist endpoints
-server.post('/api/v1/shortlist', async (request, reply) => {
+server.post('/api/v1/shortlist', async (request: any, reply: any) => {
   const userId = request.user.userId;
   
   const schema = z.object({
@@ -288,13 +288,13 @@ server.post('/api/v1/shortlist', async (request, reply) => {
     );
     
     return { id: shortlistId, requirements: shortlist, version };
-  } catch (error) {
+  } catch (error: any) {
     server.log.error('Error generating shortlist:', error);
     return reply.code(500).send({ message: 'Failed to generate shortlist' });
   }
 });
 
-server.get('/api/v1/shortlist/:id', async (request, reply) => {
+server.get('/api/v1/shortlist/:id', async (request: any, reply: any) => {
   const { id } = request.params as { id: string };
   const userId = request.user.userId;
   

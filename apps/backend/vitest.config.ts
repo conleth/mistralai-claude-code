@@ -10,6 +10,9 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
     },
+    typecheck: {
+      tsconfigPath: './tsconfig.test.json',
+    },
   },
   resolve: {
     alias: {
