@@ -3,8 +3,7 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
-import { z } from 'zod';
-import { IntegrationError, AuthenticationError, ApiError, MappingError } from './errors';
+import { IntegrationError, AuthenticationError, ApiError } from './errors.js';
 import type { ShortlistedRequirement } from '@security-rat/types';
 
 /**
@@ -44,16 +43,16 @@ interface RallyAdapterConfig {
 /**
  * Field mappings for Rally
  */
-const DEFAULT_FIELD_MAPPINGS: Record<string, string> = {
-  'security-requirement-id': 'c_RequirementID',
-  'security-requirement-title': 'Name',
-  'security-requirement-description': 'Description',
-  'security-requirement-level': 'c_Level',
-  'security-requirement-category': 'c_Category',
-  'security-requirement-standard': 'c_Standard',
-  'security-requirement-rationale': 'c_Rationale',
-  'security-requirement-status': 'State',
-};
+// const DEFAULT_FIELD_MAPPINGS: Record<string, string> = {
+//   'security-requirement-id': 'c_RequirementID',
+//   'security-requirement-title': 'Name',
+//   'security-requirement-description': 'Description',
+//   'security-requirement-level': 'c_Level',
+//   'security-requirement-category': 'c_Category',
+//   'security-requirement-standard': 'c_Standard',
+//   'security-requirement-rationale': 'c_Rationale',
+//   'security-requirement-status': 'State',
+// };
 
 /**
  * Rally adapter
@@ -61,7 +60,7 @@ const DEFAULT_FIELD_MAPPINGS: Record<string, string> = {
 export class RallyAdapter {
   private client: AxiosInstance;
   private credentials: RallyCredentials;
-  private fieldMappings: Record<string, string>;
+  // private fieldMappings: Record<string, string> = {};
   private workspace: string;
   private project: string;
 
@@ -70,7 +69,6 @@ export class RallyAdapter {
    */
   constructor(config: RallyAdapterConfig) {
     this.credentials = config.credentials;
-    this.fieldMappings = { ...DEFAULT_FIELD_MAPPINGS, ...config.fieldMappings };
     this.workspace = config.credentials.workspace || 'Default Workspace';
     this.project = config.credentials.project || 'Default Project';
 
@@ -178,7 +176,7 @@ export class RallyAdapter {
       const ticket = await this.getTicketByRef(ticketRef);
 
       return ticket;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof ApiError) {
         throw new IntegrationError(
           `Failed to create Rally ticket for requirement ${requirement.requirementId}: ${error.message}`,
@@ -309,16 +307,17 @@ ${requirement.rationale}
     shortlistId: string,
     ticketIds: string[],
     options: { 
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       linkType?: string;
       description?: string;
     } = {}
   ): Promise<void> {
-    const { linkType = 'Depends On', description = `Linked to shortlist ${shortlistId}` } = options;
+    const { description = `Linked to shortlist ${shortlistId}` } = options;
 
     // In Rally, we create a parent task and link all tickets to it
     try {
       // Create a parent task
-      const parentTask = await this.client.post('/slm/webservices/v2.0/task', {
+      await this.client.post('/slm/webservices/v2.0/task', {
         'Name': `Shortlist: ${shortlistId}`,
         'Description': description,
         'Project': { _ref: `/project/${this.project}` },

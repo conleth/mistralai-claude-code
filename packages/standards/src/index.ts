@@ -3,7 +3,7 @@
  * OWASP ASVS & SPVS data ingestion and management
  */
 
-import type { Standard, ShortlistedRequirement } from '@security-rat/types';
+import type { Standard } from '@security-rat/types';
 import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 
@@ -85,8 +85,8 @@ export async function loadStandard(
     standardsCache.set(cacheKey, requirements);
 
     return requirements;
-  } catch (error) {
-    if (error.code === 'ENOENT') {
+  } catch (error: unknown) {
+    if (error instanceof Error && 'code' in error && error.code === 'ENOENT') {
       throw new Error(`Standard file not found: ${filePath}`);
     }
     throw error;
@@ -142,7 +142,7 @@ function getVersionFromId(requirementId: string): string {
   if (requirementId.startsWith('v')) {
     // ASVS format
     const match = requirementId.match(/^v(\d+\.\d+\.\d+)-/);
-    return match ? match[1] : '5.0.0';
+    return match?.[1] ?? '5.0.0';
   } else if (requirementId.startsWith('V')) {
     // SPVS format - no version in ID, use default
     return '1.0';

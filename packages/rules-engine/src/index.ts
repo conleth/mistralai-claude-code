@@ -25,7 +25,6 @@ export function computeDerivedAttributes(
   const authType = answers['auth-type'] as string;
   const dataSensitivity = answers['data-sensitivity'] as string;
   const internetExposed = answers['internet-exposed'] as string;
-  const hostingModel = answers['hosting-model'] as string;
   const pipelineMaturity = answers['pipeline-maturity'] as string;
 
   // Determine if internet exposed
@@ -122,7 +121,7 @@ export function evaluateRules(
 
       if (matchedRules.length > 0) {
         // Generate rationale from the first matching rule
-        const rationale = generateRationale(matchedRules[0], derivedAttributes);
+        const rationale = generateRationale(matchedRules[0]!, derivedAttributes);
 
         shortlisted.push({
           standard: requirement.standard,

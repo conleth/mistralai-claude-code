@@ -7,7 +7,7 @@
  */
 
 import { loadStandard } from '@security-rat/standards';
-import { applyRules, computeDerivedAttributes } from './index';
+import { applyRules } from './index';
 import type {
   QuestionnaireAnswers,
   RequirementRule,
@@ -435,7 +435,8 @@ async function main() {
 }
 
 // Run the demo if this file is executed directly
-if (import.meta.vitest) {
+// @ts-ignore - import.meta.vitest is a Vitest-specific global
+if (import.meta?.vitest) {
   // This is being run by Vitest
   // Note: generateShortlist is imported from index.ts, not defined here
 } else {

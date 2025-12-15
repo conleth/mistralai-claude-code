@@ -11,7 +11,8 @@
   "scripts": {
     "init": "bash tools/init.sh",
     "dev": "npm run dev --workspaces --if-present",
-    "build": "npm run clean:dist && npm run build --workspaces --if-present",
+    "build": "npm run clean:dist && npm run build:packages && npm run build --workspaces --if-present",
+    "build:packages": "npm run build --workspaces --if-present --filter='./packages/*' --no-workspace-packages",
     "test": "npm run test --workspaces --if-present",
     "lint": "npm run lint --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

@@ -1,0 +1,96 @@
+# Docker Compose for Security RAT Modern
+# This setup includes:
+# - PostgreSQL database
+# - Backend API service
+# - Frontend web service
+# - Redis for caching (optional)
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: security-rat-postgres
+    environment:
+      POSTGRES_USER: securityrat
+      POSTGRES_PASSWORD: securityrat
+      POSTGRES_DB: securityrat
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U securityrat -d securityrat"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - security-rat-network
+
+  # Backend API Service
+  backend:
+    build:
+      context: .
+      dockerfile: apps/backend/Dockerfile
+    container_name: security-rat-backend
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://securityrat:securityrat@postgres:5432/securityrat
+      JWT_SECRET: ${JWT_SECRET:-supersecret}
+      REDIS_URL: redis://redis:6379
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/backend/data:/app/data
+    restart: unless-stopped
+    networks:
+      - security-rat-network
+
+  # Frontend Web Service
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: security-rat-frontend
+    environment:
+      NODE_ENV: production
+      VITE_API_BASE_URL: http://localhost:3000
+    depends_on:
+      - backend
+    ports:
+      - "1234:80"
+    restart: unless-stopped
+    networks:
+      - security-rat-network
+
+  # Redis (Optional for caching)
+  redis:
+    image: redis:7-alpine
+    container_name: security-rat-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - security-rat-network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  security-rat-network:
+    driver: bridge

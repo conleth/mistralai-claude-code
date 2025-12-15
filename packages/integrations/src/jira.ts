@@ -3,7 +3,7 @@
  */
 
 import axios, { AxiosInstance } from 'axios';
-import { IntegrationError, AuthenticationError, ApiError, MappingError } from './errors';
+import { IntegrationError, AuthenticationError, ApiError } from './errors.js';
 import type { ShortlistedRequirement } from '@security-rat/types';
 
 /**
@@ -54,16 +54,16 @@ interface JiraAdapterConfig {
 /**
  * Field mappings for Jira
  */
-const DEFAULT_FIELD_MAPPINGS: Record<string, string> = {
-  'security-requirement-id': 'customfield_10000',
-  'security-requirement-title': 'summary',
-  'security-requirement-description': 'description',
-  'security-requirement-level': 'customfield_10001',
-  'security-requirement-category': 'customfield_10002',
-  'security-requirement-standard': 'customfield_10003',
-  'security-requirement-rationale': 'customfield_10004',
-  'security-requirement-status': 'status',
-};
+// const DEFAULT_FIELD_MAPPINGS: Record<string, string> = {
+//   'security-requirement-id': 'customfield_10000',
+//   'security-requirement-title': 'summary',
+//   'security-requirement-description': 'description',
+//   'security-requirement-level': 'customfield_10001',
+//   'security-requirement-category': 'customfield_10002',
+//   'security-requirement-standard': 'customfield_10003',
+//   'security-requirement-rationale': 'customfield_10004',
+//   'security-requirement-status': 'status',
+// };
 
 /**
  * Jira adapter
@@ -71,7 +71,7 @@ const DEFAULT_FIELD_MAPPINGS: Record<string, string> = {
 export class JiraAdapter {
   private client: AxiosInstance;
   private credentials: JiraCredentials;
-  private fieldMappings: Record<string, string>;
+  // private fieldMappings: Record<string, string> = {};
   private projectKey: string;
   private issueType: string;
 
@@ -80,7 +80,6 @@ export class JiraAdapter {
    */
   constructor(config: JiraAdapterConfig) {
     this.credentials = config.credentials;
-    this.fieldMappings = { ...DEFAULT_FIELD_MAPPINGS, ...config.fieldMappings };
     this.projectKey = config.credentials.projectKey || 'SEC';
     this.issueType = config.credentials.issueType || 'Task';
 
@@ -186,7 +185,7 @@ export class JiraAdapter {
       const response = await this.client.post('/rest/api/2/issue', issueData);
 
       return response.data;
-    } catch (error) {
+    } catch (error: unknown) {
       if (error instanceof ApiError) {
         throw new IntegrationError(
           `Failed to create Jira issue for requirement ${requirement.requirementId}: ${error.message}`,
@@ -319,7 +318,7 @@ hr
     const jiraStatus = statusMap[status] || 'To Do';
 
     try {
-      const response = await this.client.put(`/rest/api/2/issue/${issueId}/transitions`, {
+      await this.client.put(`/rest/api/2/issue/${issueId}/transitions`, {
         'transition': {
           'name': jiraStatus,
         },
