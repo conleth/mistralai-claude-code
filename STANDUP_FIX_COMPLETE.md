@@ -93,3 +93,20 @@ All builds produce output in:
 - These warnings don't affect runtime functionality
 - Docker builds work but are not included in the standup script to avoid complexity
 - For production, consider adding Docker build steps back once all dependencies are properly set up
+
+## Default Admin User
+
+A default admin user has been created with the seed script:
+
+- **Email**: `admin@example.com`
+- **Password**: `password123`
+- **Role**: `security-lead`
+
+To use this user:
+1. Start the services: `docker-compose up -d`
+2. Access the frontend at `http://localhost:1234`
+3. Log in with the credentials above
+
+**Note**: Registration is currently broken and needs to be fixed. The seed script provides a workaround.
+
+See `scripts/README.md` for more information about database scripts.

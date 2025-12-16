@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@fastify/cors": "^10.0.1",
-    "@fastify/jwt": "^8.0.1",
+    "@fastify/jwt": "^5.0.0",
     "@security-rat/integrations": "*",
     "@security-rat/questionnaire": "*",
     "@security-rat/rules-engine": "*",

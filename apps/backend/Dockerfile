@@ -1,17 +1,16 @@
 # Backend Dockerfile for Security RAT Modern
 
-# Production stage
-FROM node:20-alpine AS runner
+# Use the existing local build
+FROM node:20-alpine
 
 WORKDIR /app
 
 # Copy built files from host
-COPY apps/backend/dist ./dist
-COPY apps/backend/package*.json ./
+COPY dist ./dist
 COPY packages/*/dist ./packages/
 COPY node_modules ./node_modules
 
-# Create data directory
+# Create data directory for SQLite
 RUN mkdir -p /app/data
 
 # Environment variables

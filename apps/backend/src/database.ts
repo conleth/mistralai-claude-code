@@ -4,13 +4,18 @@
 
 import sqlite3 from 'sqlite3';
 import { open, Database as SqliteDatabase } from 'sqlite';
-import { Database } from 'sqlite3';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// Get directory name in ES module compatible way
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Database configuration
 const DB_PATH = path.join(process.cwd(), 'data', 'security-rat.db');
-const MIGRATIONS_DIR = path.join(__dirname, 'migrations');
+// Migrations are in the source directory (src/migrations)
+const MIGRATIONS_DIR = path.join(__dirname, '../src/migrations');
 
 // Ensure data directory exists
 if (!fs.existsSync(path.dirname(DB_PATH))) {
@@ -25,7 +30,7 @@ export async function initializeDatabase(): Promise<SqliteDatabase> {
   
   const db = await open({
     filename: DB_PATH,
-    driver: Database,
+    driver: sqlite3.Database,
     mode: sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
   });
 

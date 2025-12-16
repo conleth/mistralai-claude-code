@@ -33,7 +33,7 @@ await server.register(cors, {
   origin: true,
 });
 
-await server.register(jwt, {
+await server.register(jwt as any, {
   secret: process.env.JWT_SECRET || 'supersecret',
 });
 

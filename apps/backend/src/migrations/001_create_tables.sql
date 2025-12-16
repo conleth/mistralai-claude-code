@@ -72,6 +72,19 @@ CREATE TABLE IF NOT EXISTS comments (
   FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
+-- Create ExternalReferences table
+CREATE TABLE IF NOT EXISTS external_references (
+  id TEXT PRIMARY KEY,
+  shortlist_id TEXT NOT NULL,
+  requirement_id TEXT NOT NULL,
+  external_system TEXT NOT NULL,
+  external_id TEXT NOT NULL,
+  url TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (shortlist_id) REFERENCES shortlists(id),
+  UNIQUE(shortlist_id, requirement_id, external_system)
+);
+
 -- Create AuditLog table
 CREATE TABLE IF NOT EXISTS audit_log (
   id INTEGER PRIMARY KEY AUTOINCREMENT,

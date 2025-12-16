@@ -46,11 +46,15 @@ This tool helps teams quickly generate security requirement checklists by:
 # Install dependencies
 npm install
 
-# Build all packages
-npm run build
+# Setup database
+./tools/setup-db.sh
 
-# Run development servers
-npm run dev
+# Start development (recommended)
+./start-dev.sh
+
+# Or start manually
+cd apps/backend && npm run dev  # Backend
+cd apps/frontend && npm run dev   # Frontend
 ```
 
 ### Development
@@ -65,6 +69,29 @@ npm run test
 # Clean build artifacts
 npm run clean
 ```
+
+## Database
+
+The project uses **SQLite** for data persistence. The database is automatically created and managed when the backend starts.
+
+- **Database file**: `apps/backend/data/security-rat.db`
+- **Setup script**: `./tools/setup-db.sh`
+- **Documentation**: See [DATABASE_SETUP.md](./DATABASE_SETUP.md)
+
+### Database Schema
+
+The database includes 11 tables:
+- `users` - User accounts
+- `questionnaires` - Security questionnaires
+- `questionnaire_answers` - User responses
+- `shortlists` - Generated requirement shortlists
+- `requirement_status` - Status tracking
+- `comments` - Comments on requirements
+- `external_references` - Links to external systems
+- `audit_log` - Audit trail
+- `webhooks` - Webhook configurations
+- `webhook_logs` - Webhook delivery logs
+- `migrations` - Migration tracking
 
 ## Project Status
 
