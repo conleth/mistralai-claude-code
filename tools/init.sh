@@ -144,6 +144,7 @@ WORKSPACES=(
   "packages/types"
   "packages/rules-engine"
   "packages/standards"
+  "packages/questionnaire"
 )
 
 for workspace in "${WORKSPACES[@]}"; do
@@ -155,7 +156,30 @@ for workspace in "${WORKSPACES[@]}"; do
   fi
 done
 
-# 7. Check dependencies
+# 7. Check implementation files
+section "Implementation Files"
+
+IMPLEMENTATION_FILES=(
+  "packages/types/src/index.ts"
+  "packages/rules-engine/src/index.ts"
+  "packages/rules-engine/src/index.test.ts"
+  "packages/standards/src/index.ts"
+  "packages/standards/src/index.test.ts"
+  "packages/questionnaire/src/index.ts"
+  "packages/questionnaire/src/index.test.ts"
+  "packages/standards/data/asvs-5.0.json"
+  "packages/standards/data/spvs-1.0.json"
+)
+
+for file in "${IMPLEMENTATION_FILES[@]}"; do
+  if [ -f "$file" ]; then
+    success "$file"
+  else
+    error "Missing implementation file: $file"
+  fi
+done
+
+# 8. Check dependencies
 section "Dependencies"
 if [ -d node_modules ]; then
   success "Root node_modules exists"

@@ -3,6 +3,7 @@
 .env.local
 .env.*.local
 .claude/*
+.vibe/*
 
 # Dependencies
 node_modules/

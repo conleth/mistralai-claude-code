@@ -2,6 +2,10 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+LOG_DIR="${ROOT_DIR}/logs"
+LOG_FILE="${LITELLM_LOG_FILE:-${LOG_DIR}/litellm.log}"
+
+mkdir -p "$LOG_DIR"
 
 # Load project .env if present (for MISTRAL_API_KEY, etc.)
 if [[ -f "$ROOT_DIR/.env" ]]; then
@@ -14,6 +18,9 @@ fi
 # Required for callback import and Mistral auth
 export PYTHONPATH="$ROOT_DIR/tools${PYTHONPATH:+:$PYTHONPATH}"
 export LITELLM_MASTER_KEY="${LITELLM_MASTER_KEY:-lcl-local}"
+
+echo "Logging to $LOG_FILE"
+exec > >(tee -a "$LOG_FILE") 2>&1
 
 echo "Starting LiteLLM on port 4000 with config tools/litellm.yaml"
 echo "PYTHONPATH=$PYTHONPATH"

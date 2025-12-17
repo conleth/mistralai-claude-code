@@ -1,0 +1,945 @@
+openapi: 3.0.3
+info:
+  title: Claude Messages API
+  description: |
+    The Messages API from Anthropic allows you to send a structured list of input messages with text and/or image content, 
+    and the model will generate the next message in the conversation.
+    
+    The API supports features like:
+    - Multi-turn conversations
+    - Vision (image understanding)
+    - Tool use (function calling)
+    - Streaming responses
+    - Prompt caching
+    
+    For more details, visit https://docs.anthropic.com
+  version: 2023-06-01
+  contact:
+    name: Anthropic Support
+    url: https://support.anthropic.com
+  x-logo:
+    url: https://www.anthropic.com/images/icons/safari-pinned-tab.svg
+
+servers:
+  - url: https://api.anthropic.com/v1
+    description: Production API server
+
+security:
+  - ApiKeyAuth: []
+
+tags:
+  - name: Messages
+    description: Create and manage message completions
+  - name: Models
+    description: List and retrieve available models
+
+paths:
+  /messages:
+    post:
+      tags:
+        - Messages
+      summary: Create a Message
+      description: |
+        Send a structured list of input messages with text and/or image content, 
+        and the model will generate the next message in the conversation.
+        
+        Messages can be streamed incrementally by setting `stream: true`.
+      operationId: createMessage
+      parameters:
+        - $ref: '#/components/parameters/AnthropicVersion'
+        - $ref: '#/components/parameters/AnthropicBeta'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+            examples:
+              basic:
+                summary: Basic text message
+                value:
+                  model: "claude-sonnet-4-20250514"
+                  max_tokens: 1024
+                  messages:
+                    - role: "user"
+                      content: "Hello, Claude!"
+              vision:
+                summary: Message with image
+                value:
+                  model: "claude-sonnet-4-20250514"
+                  max_tokens: 1024
+                  messages:
+                    - role: "user"
+                      content:
+                        - type: "image"
+                          source:
+                            type: "base64"
+                            media_type: "image/jpeg"
+                            data: "/9j/4AAQSkZJRg..."
+                        - type: "text"
+                          text: "What's in this image?"
+              tools:
+                summary: Message with tool use
+                value:
+                  model: "claude-sonnet-4-20250514"
+                  max_tokens: 1024
+                  tools:
+                    - name: "get_weather"
+                      description: "Get the current weather in a given location"
+                      input_schema:
+                        type: "object"
+                        properties:
+                          location:
+                            type: "string"
+                            description: "The city and state, e.g. San Francisco, CA"
+                        required: ["location"]
+                  messages:
+                    - role: "user"
+                      content: "What's the weather in San Francisco?"
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+            text/event-stream:
+              schema:
+                $ref: '#/components/schemas/MessageStreamEvent'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimitError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '529':
+          $ref: '#/components/responses/Overloaded'
+
+  /messages/count_tokens:
+    post:
+      tags:
+        - Messages
+      summary: Count tokens in a Message
+      description: |
+        Count the number of tokens in a Message request without creating it.
+        Useful for estimating costs and staying within model context limits.
+      operationId: countMessageTokens
+      parameters:
+        - $ref: '#/components/parameters/AnthropicVersion'
+        - $ref: '#/components/parameters/AnthropicBeta'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateMessageRequest'
+      responses:
+        '200':
+          description: Token count response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  input_tokens:
+                    type: integer
+                    description: Number of input tokens
+                    example: 150
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /models:
+    get:
+      tags:
+        - Models
+      summary: List Models
+      description: Get a list of available models
+      operationId: listModels
+      parameters:
+        - $ref: '#/components/parameters/AnthropicVersion'
+      responses:
+        '200':
+          description: List of models
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ModelInfo'
+
+  /models/{model_id}:
+    get:
+      tags:
+        - Models
+      summary: Get a Model
+      description: Get information about a specific model
+      operationId: getModel
+      parameters:
+        - name: model_id
+          in: path
+          required: true
+          schema:
+            type: string
+          example: claude-sonnet-4-20250514
+        - $ref: '#/components/parameters/AnthropicVersion'
+      responses:
+        '200':
+          description: Model information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelInfo'
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Your Anthropic API key
+
+  parameters:
+    AnthropicVersion:
+      name: anthropic-version
+      in: header
+      required: true
+      schema:
+        type: string
+        default: "2023-06-01"
+      description: The version of the Anthropic API to use
+      example: "2023-06-01"
+    
+    AnthropicBeta:
+      name: anthropic-beta
+      in: header
+      required: false
+      schema:
+        type: string
+      description: Optional beta features to enable (comma-separated)
+      example: "prompt-caching-2024-07-31"
+
+  schemas:
+    CreateMessageRequest:
+      type: object
+      required:
+        - model
+        - messages
+        - max_tokens
+      properties:
+        model:
+          type: string
+          description: |
+            The model that will complete your prompt.
+            See https://docs.anthropic.com/en/docs/models-overview for details.
+          enum:
+            - claude-opus-4-20250514
+            - claude-4-opus-20250514
+            - claude-opus-4-0
+            - claude-opus-4-1-20250805
+            - claude-sonnet-4-20250514
+            - claude-4-sonnet-20250514
+            - claude-sonnet-4-0
+            - claude-sonnet-4-5
+            - claude-sonnet-4-5-20250929
+            - claude-haiku-4-5
+            - claude-haiku-4-5-20251001
+            - claude-3-7-sonnet-20250219
+            - claude-3-5-haiku-20241022
+            - claude-3-opus-20240229
+            - claude-3-haiku-20240307
+          example: claude-sonnet-4-20250514
+        
+        messages:
+          type: array
+          description: Input messages for the conversation
+          minItems: 1
+          items:
+            $ref: '#/components/schemas/MessageParam'
+        
+        max_tokens:
+          type: integer
+          description: |
+            The maximum number of tokens to generate before stopping.
+            Different models have different maximum values.
+          minimum: 1
+          example: 1024
+        
+        metadata:
+          type: object
+          description: Object describing metadata about the request
+          properties:
+            user_id:
+              type: string
+              description: An external identifier for the user
+              maxLength: 256
+        
+        stop_sequences:
+          type: array
+          description: Custom text sequences that will cause the model to stop generating
+          maxItems: 4
+          items:
+            type: string
+          example: ["\n\nHuman:"]
+        
+        stream:
+          type: boolean
+          description: Whether to incrementally stream the response using server-sent events
+          default: false
+          example: false
+        
+        system:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                $ref: '#/components/schemas/TextBlockParam'
+          description: System prompt to provide context and instructions
+          example: "You are a helpful assistant."
+        
+        temperature:
+          type: number
+          description: |
+            Amount of randomness injected into the response.
+            Ranges from 0.0 to 1.0. Use temperature closer to 0.0 for analytical / multiple choice, 
+            and closer to 1.0 for creative and generative tasks.
+          minimum: 0.0
+          maximum: 1.0
+          default: 1.0
+          example: 0.7
+        
+        tool_choice:
+          oneOf:
+            - type: object
+              properties:
+                type:
+                  type: string
+                  enum: [auto, any, tool]
+                name:
+                  type: string
+            - type: string
+              enum: [auto, any]
+          description: How the model should use the provided tools
+        
+        tools:
+          type: array
+          description: Tools (functions) the model may use
+          items:
+            $ref: '#/components/schemas/Tool'
+        
+        top_k:
+          type: integer
+          description: Only sample from the top K options for each subsequent token
+          minimum: 0
+          example: 5
+        
+        top_p:
+          type: number
+          description: |
+            Use nucleus sampling. In nucleus sampling, we compute the cumulative distribution 
+            over all the options for each subsequent token in decreasing probability order 
+            and cut it off once it reaches a particular probability specified by top_p.
+          minimum: 0.0
+          maximum: 1.0
+          example: 0.9
+
+    MessageParam:
+      type: object
+      required:
+        - role
+        - content
+      properties:
+        role:
+          type: string
+          enum: [user, assistant]
+          description: The role of the message sender
+        content:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                $ref: '#/components/schemas/ContentBlockParam'
+          description: The content of the message
+
+    ContentBlockParam:
+      oneOf:
+        - $ref: '#/components/schemas/TextBlockParam'
+        - $ref: '#/components/schemas/ImageBlockParam'
+        - $ref: '#/components/schemas/DocumentBlockParam'
+        - $ref: '#/components/schemas/ToolUseBlockParam'
+        - $ref: '#/components/schemas/ToolResultBlockParam'
+      discriminator:
+        propertyName: type
+        mapping:
+          text: '#/components/schemas/TextBlockParam'
+          image: '#/components/schemas/ImageBlockParam'
+          document: '#/components/schemas/DocumentBlockParam'
+          tool_use: '#/components/schemas/ToolUseBlockParam'
+          tool_result: '#/components/schemas/ToolResultBlockParam'
+
+    TextBlockParam:
+      type: object
+      required:
+        - type
+        - text
+      properties:
+        type:
+          type: string
+          enum: [text]
+        text:
+          type: string
+          description: The text content
+        cache_control:
+          $ref: '#/components/schemas/CacheControlEphemeral'
+
+    ImageBlockParam:
+      type: object
+      required:
+        - type
+        - source
+      properties:
+        type:
+          type: string
+          enum: [image]
+        source:
+          oneOf:
+            - $ref: '#/components/schemas/Base64ImageSource'
+            - $ref: '#/components/schemas/URLImageSource'
+        cache_control:
+          $ref: '#/components/schemas/CacheControlEphemeral'
+
+    DocumentBlockParam:
+      type: object
+      required:
+        - type
+        - source
+      properties:
+        type:
+          type: string
+          enum: [document]
+        source:
+          oneOf:
+            - $ref: '#/components/schemas/Base64PDFSource'
+            - $ref: '#/components/schemas/URLPDFSource'
+        cache_control:
+          $ref: '#/components/schemas/CacheControlEphemeral'
+
+    Base64ImageSource:
+      type: object
+      required:
+        - type
+        - media_type
+        - data
+      properties:
+        type:
+          type: string
+          enum: [base64]
+        media_type:
+          type: string
+          enum: [image/jpeg, image/png, image/gif, image/webp]
+        data:
+          type: string
+          description: Base64-encoded image data
+
+    URLImageSource:
+      type: object
+      required:
+        - type
+        - url
+      properties:
+        type:
+          type: string
+          enum: [url]
+        url:
+          type: string
+          format: uri
+          description: URL of the image
+
+    Base64PDFSource:
+      type: object
+      required:
+        - type
+        - media_type
+        - data
+      properties:
+        type:
+          type: string
+          enum: [base64]
+        media_type:
+          type: string
+          enum: [application/pdf]
+        data:
+          type: string
+          description: Base64-encoded PDF data
+
+    URLPDFSource:
+      type: object
+      required:
+        - type
+        - url
+      properties:
+        type:
+          type: string
+          enum: [url]
+        url:
+          type: string
+          format: uri
+          description: URL of the PDF
+
+    ToolUseBlockParam:
+      type: object
+      required:
+        - type
+        - id
+        - name
+        - input
+      properties:
+        type:
+          type: string
+          enum: [tool_use]
+        id:
+          type: string
+          description: Unique identifier for this tool use
+        name:
+          type: string
+          description: Name of the tool
+        input:
+          type: object
+          description: Input to pass to the tool
+        cache_control:
+          $ref: '#/components/schemas/CacheControlEphemeral'
+
+    ToolResultBlockParam:
+      type: object
+      required:
+        - type
+        - tool_use_id
+      properties:
+        type:
+          type: string
+          enum: [tool_result]
+        tool_use_id:
+          type: string
+          description: ID of the tool use this is a result for
+        content:
+          oneOf:
+            - type: string
+            - type: array
+              items:
+                $ref: '#/components/schemas/ContentBlockParam'
+          description: Result of the tool use
+        is_error:
+          type: boolean
+          description: Whether the tool execution resulted in an error
+        cache_control:
+          $ref: '#/components/schemas/CacheControlEphemeral'
+
+    CacheControlEphemeral:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [ephemeral]
+        ttl:
+          type: string
+          enum: ["5m", "1h"]
+          description: Time-to-live for the cache entry (5 minutes or 1 hour)
+          default: "5m"
+
+    Tool:
+      type: object
+      required:
+        - name
+        - input_schema
+      properties:
+        name:
+          type: string
+          description: Name of the tool
+          minLength: 1
+          maxLength: 128
+        description:
+          type: string
+          description: Detailed description of what the tool does
+        input_schema:
+          type: object
+          description: JSON Schema for the tool's input
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum: [object]
+            properties:
+              type: object
+            required:
+              type: array
+              items:
+                type: string
+        cache_control:
+          $ref: '#/components/schemas/CacheControlEphemeral'
+
+    Message:
+      type: object
+      required:
+        - id
+        - type
+        - role
+        - content
+        - model
+        - stop_reason
+        - usage
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this message
+          example: msg_01XFDUDYJgAACzvnptvVoYEL
+        type:
+          type: string
+          enum: [message]
+          description: Object type (always "message")
+        role:
+          type: string
+          enum: [assistant]
+          description: Conversational role (always "assistant" for responses)
+        content:
+          type: array
+          description: Array of content blocks generated by the model
+          items:
+            $ref: '#/components/schemas/ContentBlock'
+        model:
+          type: string
+          description: The model that generated this response
+          example: claude-sonnet-4-20250514
+        stop_reason:
+          type: string
+          enum: [end_turn, max_tokens, stop_sequence, tool_use, pause_turn, refusal]
+          description: |
+            The reason the model stopped generating:
+            - end_turn: Natural stopping point
+            - max_tokens: Reached max_tokens limit
+            - stop_sequence: Hit a stop sequence
+            - tool_use: Model wants to use a tool
+            - pause_turn: Long-running turn paused
+            - refusal: Content policy intervention
+        stop_sequence:
+          type: string
+          nullable: true
+          description: The stop sequence that caused generation to stop
+        usage:
+          $ref: '#/components/schemas/Usage'
+
+    ContentBlock:
+      oneOf:
+        - $ref: '#/components/schemas/TextBlock'
+        - $ref: '#/components/schemas/ToolUseBlock'
+      discriminator:
+        propertyName: type
+
+    TextBlock:
+      type: object
+      required:
+        - type
+        - text
+      properties:
+        type:
+          type: string
+          enum: [text]
+        text:
+          type: string
+          description: The generated text
+
+    ToolUseBlock:
+      type: object
+      required:
+        - type
+        - id
+        - name
+        - input
+      properties:
+        type:
+          type: string
+          enum: [tool_use]
+        id:
+          type: string
+          description: Unique identifier for this tool use
+        name:
+          type: string
+          description: Name of the tool the model wants to use
+        input:
+          type: object
+          description: Input the model wants to pass to the tool
+
+    Usage:
+      type: object
+      required:
+        - input_tokens
+        - output_tokens
+      properties:
+        input_tokens:
+          type: integer
+          description: Number of input tokens used
+          minimum: 0
+        output_tokens:
+          type: integer
+          description: Number of output tokens generated
+          minimum: 0
+        cache_creation_input_tokens:
+          type: integer
+          description: Number of tokens used to create cache entries
+          minimum: 0
+        cache_read_input_tokens:
+          type: integer
+          description: Number of tokens read from cache
+          minimum: 0
+
+    MessageStreamEvent:
+      oneOf:
+        - $ref: '#/components/schemas/MessageStartEvent'
+        - $ref: '#/components/schemas/ContentBlockStartEvent'
+        - $ref: '#/components/schemas/ContentBlockDeltaEvent'
+        - $ref: '#/components/schemas/ContentBlockStopEvent'
+        - $ref: '#/components/schemas/MessageDeltaEvent'
+        - $ref: '#/components/schemas/MessageStopEvent'
+      discriminator:
+        propertyName: type
+
+    MessageStartEvent:
+      type: object
+      required:
+        - type
+        - message
+      properties:
+        type:
+          type: string
+          enum: [message_start]
+        message:
+          $ref: '#/components/schemas/Message'
+
+    ContentBlockStartEvent:
+      type: object
+      required:
+        - type
+        - index
+        - content_block
+      properties:
+        type:
+          type: string
+          enum: [content_block_start]
+        index:
+          type: integer
+          description: Index of the content block
+        content_block:
+          $ref: '#/components/schemas/ContentBlock'
+
+    ContentBlockDeltaEvent:
+      type: object
+      required:
+        - type
+        - index
+        - delta
+      properties:
+        type:
+          type: string
+          enum: [content_block_delta]
+        index:
+          type: integer
+        delta:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [text_delta, input_json_delta]
+            text:
+              type: string
+            partial_json:
+              type: string
+
+    ContentBlockStopEvent:
+      type: object
+      required:
+        - type
+        - index
+      properties:
+        type:
+          type: string
+          enum: [content_block_stop]
+        index:
+          type: integer
+
+    MessageDeltaEvent:
+      type: object
+      required:
+        - type
+        - delta
+        - usage
+      properties:
+        type:
+          type: string
+          enum: [message_delta]
+        delta:
+          type: object
+          properties:
+            stop_reason:
+              type: string
+              enum: [end_turn, max_tokens, stop_sequence, tool_use]
+            stop_sequence:
+              type: string
+        usage:
+          type: object
+          properties:
+            output_tokens:
+              type: integer
+
+    MessageStopEvent:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [message_stop]
+
+    ModelInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Model identifier
+          example: claude-sonnet-4-20250514
+        display_name:
+          type: string
+          description: Human-readable model name
+          example: Claude Sonnet 4
+        created_at:
+          type: string
+          format: date-time
+          description: When the model was created
+        type:
+          type: string
+          enum: [model]
+
+    Error:
+      type: object
+      required:
+        - type
+        - error
+      properties:
+        type:
+          type: string
+          enum: [error]
+        error:
+          type: object
+          required:
+            - type
+            - message
+          properties:
+            type:
+              type: string
+              enum: 
+                - invalid_request_error
+                - authentication_error
+                - permission_error
+                - not_found_error
+                - rate_limit_error
+                - api_error
+                - overloaded_error
+            message:
+              type: string
+              description: Human-readable error message
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: invalid_request_error
+              message: "Invalid request format"
+
+    Unauthorized:
+      description: Authentication error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: authentication_error
+              message: "Invalid API key"
+
+    Forbidden:
+      description: Permission denied
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: permission_error
+              message: "Your API key does not have permission to use the specified model"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: not_found_error
+              message: "The requested resource was not found"
+
+    RateLimitError:
+      description: Rate limit exceeded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: rate_limit_error
+              message: "Rate limit exceeded"
+
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: api_error
+              message: "An unexpected error occurred"
+
+    Overloaded:
+      description: API is temporarily overloaded
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            type: error
+            error:
+              type: overloaded_error
+              message: "The API is temporarily overloaded"

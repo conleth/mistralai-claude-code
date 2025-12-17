@@ -18,7 +18,9 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "composite": true
+    "composite": true,
+    "outDir": "./dist",
+    "rootDir": "."
   },
   "exclude": ["node_modules", "dist", "build"]
 }
